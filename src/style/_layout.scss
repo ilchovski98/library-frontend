@@ -20,6 +20,15 @@
   flex: 1;
 }
 
+.panel {
+  border: 1px solid #000;
+  border-radius: 10px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 10px 2px rgb(0 0 0 / 16%);
+  background-color: #fff;
+  width: 100%;
+}
+
 .footer {
   background-color: $light;
   padding: 24px;

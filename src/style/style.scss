@@ -1,8 +1,21 @@
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+}
+
 @import 'variables.scss';
 @import 'mixins.scss';
 @import 'bootstrap.scss';
 @import 'typography.scss';
 @import 'layout.scss';
+
+// Components
+@import 'components/card.scss';
+@import 'components/custom-modal.scss';
+@import 'components/custom-dropdown.scss';
 
 .img-profile {
   width: 32px;

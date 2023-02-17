@@ -35,5 +35,8 @@
     "react-scripts": "5.0.1",
     "sass": "^1.54.0",
     "wagmi": "^0.10.10"
+  },
+  "devDependencies": {
+    "react-icons": "^4.7.1"
   }
 }

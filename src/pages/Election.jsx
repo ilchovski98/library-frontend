@@ -6,7 +6,7 @@ import Button from '../components/ui/Button';
 
 const Election = () => {
   const { data: signer } = useSigner();
-  const contractAddress = '0x6F9D6E5Ac24507016FADda1898AadbE04b407df3';
+  const contractAddress = '0x647FB6bd334E59419FbaaCfD27A4D4a03630eB40';
 
   const electionMapping = {
     0: 'Tie',
@@ -113,10 +113,11 @@ const Election = () => {
       <div className="row">
         <div className="col-6 offset-3">
           <h2 className="heading-medium text-center mb-5">Election</h2>
+
           {isLoadingContractData ? (
             <div className="d-flex justify-content-center align-items-center">
-              <div class="spinner-border text-info" role="status">
-                <span class="visually-hidden">Loading...</span>
+              <div className="spinner-border text-info" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
               <p className="text-center ms-3">Loading...</p>
             </div>
@@ -141,7 +142,7 @@ const Election = () => {
                     <div className="text-center">
                       <p>{electionMapping[2]}</p>
                       <p>
-                        <span class="badge text-bg-danger text-small">
+                        <span className="badge text-bg-danger text-small">
                           {contractData.seatsTrump}
                         </span>
                       </p>

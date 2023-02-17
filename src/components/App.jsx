@@ -2,16 +2,18 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { sepolia } from 'wagmi/chains';
+import { goerli } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
+import Home from '../pages/Home';
 import Election from '../pages/Election';
+import Library from '../pages/Library';
 
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 
 function App() {
-  const { provider } = configureChains([sepolia], [publicProvider()]);
+  const { provider } = configureChains([goerli], [publicProvider()]);
 
   const client = createClient({
     provider,
@@ -25,7 +27,9 @@ function App() {
           <Header />
           <div className="main">
             <Routes>
-              <Route path="/" element={<Election />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/election" element={<Election />} />
+              <Route path="/library" element={<Library />} />
             </Routes>
           </div>
           <Footer />
