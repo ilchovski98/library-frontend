@@ -16,7 +16,7 @@ const Library = () => {
 
   const filterOptions = [
     { label: 'All Books', value: 'all-books' },
-    { label: 'Available Books', value: 'avalilable-books' },
+    { label: 'Available Books', value: 'available-books' },
     { label: 'My Books', value: 'my-books' },
   ];
 
@@ -34,6 +34,7 @@ const Library = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [newBookFromData, setNewBookFormData] = useState(initialNewBookFormData);
+  const [isLoadingSubmitNewBook, setIsLoadingSubmitNewBook] = useState(false);
 
   const getBooks = useCallback(async () => {
     setIsLoadingBooks(true);
@@ -57,9 +58,9 @@ const Library = () => {
   const filterBooks = useCallback(() => {
     let filteredBooks;
 
-    if (filterBy === 'available-books') {
+    if (filterBy.value === 'available-books') {
       filteredBooks = books.filter(book => book.copies.toNumber() > 0);
-    } else if (filterBy === 'my-books') {
+    } else if (filterBy.value === 'my-books') {
       filteredBooks = books.filter(book => book.copies.toNumber() > 0);
     } else {
       filteredBooks = books;
@@ -67,6 +68,24 @@ const Library = () => {
 
     setFilteredBooks(filteredBooks);
   }, [books, filterBy]);
+
+  const borrowBook = useCallback(
+    async bookName => {
+      const borrowBookTx = await contract.borrowBook(bookName);
+      const receipt = await borrowBookTx.wait();
+      console.log('borrow receipt', receipt);
+    },
+    [contract],
+  );
+
+  const returnBook = useCallback(
+    async bookName => {
+      const returnBookTx = await contract.returnBook(bookName);
+      const receipt = await returnBookTx.wait();
+      console.log('return receipt', receipt);
+    },
+    [contract],
+  );
 
   const handleFilterByChange = option => {
     setFilterBy(option);
@@ -83,19 +102,27 @@ const Library = () => {
   };
 
   // Modal
-  const handleModal = () => {
+  const handleModal = useCallback(async () => {
     setNewBookFormData(initialNewBookFormData);
     setShowModal(!showModal);
-  };
+  }, [initialNewBookFormData, showModal]);
 
   const createNewBook = useCallback(async () => {
+    setIsLoadingSubmitNewBook(true);
     const createBookTx = await contract.addBook(newBookFromData.name, newBookFromData.copies);
     await createBookTx.wait();
+    setIsLoadingSubmitNewBook(false);
     handleModal();
-  }, [contract, handleModal]);
+    await getBooks();
+  }, [contract, handleModal, newBookFromData, getBooks]);
 
   const modalActionBar = [
-    <Button onClick={createNewBook} className="mx-3" key="accept-modal-btn">
+    <Button
+      onClick={createNewBook}
+      loading={isLoadingSubmitNewBook}
+      className="mx-3"
+      key="accept-modal-btn"
+    >
       Create
     </Button>,
     <Button onClick={handleModal} key="cancel-modal-btn">
@@ -143,10 +170,12 @@ const Library = () => {
   }, [signer]);
 
   useEffect(() => {
+    console.log('UseEffect 1 getBooks');
     contract && getBooks();
   }, [contract, getBooks]);
 
   useEffect(() => {
+    console.log('UseEffect 2 filterBooks');
     contract && filterBooks();
   }, [contract, filterBy, filterBooks]);
 
@@ -171,7 +200,11 @@ const Library = () => {
           {showModal && modal}
         </div>
 
-        {isLoadingBooks ? <LoadingSpinner /> : <BookList bookList={filteredBooks} />}
+        {isLoadingBooks ? (
+          <LoadingSpinner />
+        ) : (
+          <BookList bookList={filteredBooks} borrowBook={borrowBook} returnBook={returnBook} />
+        )}
       </div>
     </div>
   );
