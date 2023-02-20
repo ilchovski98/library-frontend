@@ -30,16 +30,19 @@ const useLibrary = () => {
   }, [contract]);
 
   const borrowBook = async bookName => {
+    await contract.callStatic.borrowBook(bookName);
     const borrowBookTx = await contract.borrowBook(bookName);
     await borrowBookTx.wait();
   };
 
   const returnBook = async bookName => {
+    await contract.callStatic.returnBook(bookName);
     const returnBookTx = await contract.returnBook(bookName);
     await returnBookTx.wait();
   };
 
   const createNewBook = async (bookName, bookCopies) => {
+    await contract.callStatic.addBook(bookName, bookCopies);
     const createBookTx = await contract.addBook(bookName, bookCopies);
     await createBookTx.wait();
   };

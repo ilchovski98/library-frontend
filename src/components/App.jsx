@@ -5,7 +5,6 @@ import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { goerli } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
-import Home from '../pages/Home';
 import Election from '../pages/Election';
 import Library from '../pages/Library';
 

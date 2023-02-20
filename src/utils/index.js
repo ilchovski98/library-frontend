@@ -4,10 +4,9 @@ export function truncate(str, n) {
     : str;
 }
 
-export function setError(errorMessage, setErrorState) {
-  if (!(errorMessage === 'user rejected transaction')) {
-    setErrorState(errorMessage);
-  } else {
-    setErrorState('');
-  }
+export function handleErrorMessage(error, setErrorMessage) {
+  const errorMessage = error.errorName
+    ? `Execution reverted with error: ${error.errorName}!`
+    : error.reason;
+  setErrorMessage(errorMessage?.includes('user rejected transaction') ? '' : errorMessage);
 }

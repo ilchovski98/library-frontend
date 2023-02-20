@@ -9,7 +9,7 @@ import BookList from '../components/Book/BookList';
 import Modal from '../components/layout/Modal';
 import Dropdown from '../components/ui/Dropdown';
 import useLibrary from '../hooks/use-library';
-import { setError } from '../utils/index';
+import { handleErrorMessage } from '../utils/index';
 
 const Library = () => {
   const { isConnected, address } = useAccount();
@@ -73,7 +73,7 @@ const Library = () => {
       setBookListError('');
       await getBooks();
     } catch (error) {
-      setError(error.reason, setBookListError);
+      handleErrorMessage(error, setBookListError);
     }
   };
 
@@ -83,7 +83,7 @@ const Library = () => {
       setBookListError('');
       await getBooks();
     } catch (error) {
-      setError(error.reason, setBookListError);
+      handleErrorMessage(error, setBookListError);
     }
   };
 
@@ -110,7 +110,7 @@ const Library = () => {
       await getBooks();
     } catch (error) {
       setIsLoadingNewBookModalSubmit(false);
-      setError(error.reason, setNewBookModalError);
+      handleErrorMessage(error, setNewBookModalError);
     }
   };
 
