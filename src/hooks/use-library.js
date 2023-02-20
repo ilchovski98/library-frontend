@@ -29,29 +29,20 @@ const useLibrary = () => {
     setIsLoadingBooks(false);
   }, [contract]);
 
-  const borrowBook = useCallback(
-    async bookName => {
-      const borrowBookTx = await contract.borrowBook(bookName);
-      await borrowBookTx.wait();
-    },
-    [contract],
-  );
+  const borrowBook = async bookName => {
+    const borrowBookTx = await contract.borrowBook(bookName);
+    await borrowBookTx.wait();
+  };
 
-  const returnBook = useCallback(
-    async bookName => {
-      const returnBookTx = await contract.returnBook(bookName);
-      await returnBookTx.wait();
-    },
-    [contract],
-  );
+  const returnBook = async bookName => {
+    const returnBookTx = await contract.returnBook(bookName);
+    await returnBookTx.wait();
+  };
 
-  const createNewBook = useCallback(
-    async (bookName, bookCopies) => {
-      const createBookTx = await contract.addBook(bookName, bookCopies);
-      await createBookTx.wait();
-    },
-    [contract],
-  );
+  const createNewBook = async (bookName, bookCopies) => {
+    const createBookTx = await contract.addBook(bookName, bookCopies);
+    await createBookTx.wait();
+  };
 
   useEffect(() => {
     if (signer) {

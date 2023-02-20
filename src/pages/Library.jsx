@@ -67,31 +67,25 @@ const Library = () => {
   }, [books, filterBy, contract, address]);
 
   // Handlers
-  const handleBorrowBook = useCallback(
-    async bookName => {
-      try {
-        await borrowBook(bookName);
-        setBookListError('');
-        await getBooks();
-      } catch (error) {
-        setError(error.reason, setBookListError);
-      }
-    },
-    [borrowBook, getBooks],
-  );
+  const handleBorrowBook = async bookName => {
+    try {
+      await borrowBook(bookName);
+      setBookListError('');
+      await getBooks();
+    } catch (error) {
+      setError(error.reason, setBookListError);
+    }
+  };
 
-  const handleReturnBook = useCallback(
-    async bookName => {
-      try {
-        await returnBook(bookName);
-        setBookListError('');
-        await getBooks();
-      } catch (error) {
-        setError(error.reason, setBookListError);
-      }
-    },
-    [returnBook, getBooks],
-  );
+  const handleReturnBook = async bookName => {
+    try {
+      await returnBook(bookName);
+      setBookListError('');
+      await getBooks();
+    } catch (error) {
+      setError(error.reason, setBookListError);
+    }
+  };
 
   const handleModalFormInputChange = e => {
     const { value, name } = e.target;
@@ -102,13 +96,13 @@ const Library = () => {
     }));
   };
 
-  const handleModal = useCallback(async () => {
+  const handleModal = async () => {
     setNewBookModalFormData(initialNewBookFormData);
     setShowModal(!showModal);
     setNewBookModalError('');
-  }, [initialNewBookFormData, showModal]);
+  };
 
-  const handleNewBookModalSubmit = useCallback(async () => {
+  const handleNewBookModalSubmit = async () => {
     try {
       setIsLoadingNewBookModalSubmit(true);
       await createNewBook(newBookModalFormData.name, newBookModalFormData.copies);
@@ -118,7 +112,7 @@ const Library = () => {
       setIsLoadingNewBookModalSubmit(false);
       setError(error.reason, setNewBookModalError);
     }
-  }, [createNewBook, newBookModalFormData, handleModal, getBooks]);
+  };
 
   // Modal
   const modalActionBar = [
@@ -176,7 +170,6 @@ const Library = () => {
   }, [contract, filterBy, filterBooks]);
 
   return (
-    // Wrapper component
     <div className="container my-5 my-lg-10">
       <h2 className="heading-medium text-center mb-5">Library</h2>
 
