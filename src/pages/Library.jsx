@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
-import { useSigner, useAccount } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { GiBlackBook } from 'react-icons/gi';
 
-import libraryABI from '../abi/Library.json';
-import LoadingSpinner from '../components/layout/LoadingSpinner';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import BookList from '../components/Book/BookList';
 import Modal from '../components/layout/Modal';
-import Dropdown from '../components/layout/Dropdown';
+import Dropdown from '../components/ui/Dropdown';
+import useLibrary from '../hooks/use-library';
+import { setError } from '../utils/index';
 
 const Library = () => {
-  const { data: signer } = useSigner();
-  const contractAddress = '0x210C8DEc984331de86F35Ec719F2858CC491CA45';
   const { isConnected, address } = useAccount();
 
   const filterOptions = [
@@ -29,36 +28,21 @@ const Library = () => {
     copies: 0,
   };
 
-  const [contract, setContract] = useState();
+  const { contract, books, isLoadingBooks, borrowBook, returnBook, createNewBook, getBooks } =
+    useLibrary();
 
-  const [books, setBooks] = useState([]);
+  // Page state
+  const [bookListError, setBookListError] = useState();
   const [filteredBooks, setFilteredBooks] = useState([]);
-  const [isLoadingBooks, setIsLoadingBooks] = useState(true);
   const [filterBy, setFilterBy] = useState('');
-  const [returnBorrowError, setReturnBorrowError] = useState('');
 
+  // Modal state
   const [showModal, setShowModal] = useState(false);
-  const [newBookFromData, setNewBookFormData] = useState(initialNewBookFormData);
-  const [isLoadingSubmitNewBook, setIsLoadingSubmitNewBook] = useState(false);
-  const [createBookModalError, setCreateBookModalError] = useState('');
+  const [newBookModalFormData, setNewBookModalFormData] = useState(initialNewBookFormData);
+  const [isLoadingNewBookModalSubmit, setIsLoadingNewBookModalSubmit] = useState(false);
+  const [newBookModalError, setNewBookModalError] = useState('');
 
-  const getBooks = useCallback(async () => {
-    setIsLoadingBooks(true);
-
-    const numberOfBooks = await contract.getNumberOfBooks();
-    const books = [];
-
-    for (let index = 0; index <= numberOfBooks - 1; index++) {
-      const key = await contract.bookKeys(index);
-      const book = await contract.books(key);
-      books.push(book);
-    }
-
-    setBooks(books);
-
-    setIsLoadingBooks(false);
-  }, [contract]);
-
+  // Filtering
   const filterBooks = useCallback(async () => {
     let filteredBooks = [];
 
@@ -82,83 +66,65 @@ const Library = () => {
     setFilteredBooks(filteredBooks);
   }, [books, filterBy, contract, address]);
 
-  const setError = (errorMessage, setErrorState) => {
-    if (!(errorMessage === 'user rejected transaction')) {
-      setErrorState(errorMessage);
-    } else {
-      setErrorState('');
-    }
-  };
-
-  const borrowBook = useCallback(
+  // Handlers
+  const handleBorrowBook = useCallback(
     async bookName => {
       try {
-        const borrowBookTx = await contract.borrowBook(bookName);
-        const receipt = await borrowBookTx.wait();
-        setReturnBorrowError('');
+        await borrowBook(bookName);
+        setBookListError('');
         await getBooks();
       } catch (error) {
-        setError(error.reason, setReturnBorrowError);
+        setError(error.reason, setBookListError);
       }
     },
-    [contract, getBooks],
+    [borrowBook, getBooks],
   );
 
-  const returnBook = useCallback(
+  const handleReturnBook = useCallback(
     async bookName => {
       try {
-        const returnBookTx = await contract.returnBook(bookName);
-        const receipt = await returnBookTx.wait();
-        setReturnBorrowError('');
+        await returnBook(bookName);
+        setBookListError('');
         await getBooks();
       } catch (error) {
-        setError(error.reason, setReturnBorrowError);
+        setError(error.reason, setBookListError);
       }
     },
-    [contract, getBooks],
+    [returnBook, getBooks],
   );
 
-  const handleFilterByChange = option => {
-    setFilterBy(option);
-  };
-
-  // handlers
-  const handleFormInputChange = e => {
+  const handleModalFormInputChange = e => {
     const { value, name } = e.target;
 
-    setNewBookFormData(prev => ({
+    setNewBookModalFormData(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // Modal
   const handleModal = useCallback(async () => {
-    setNewBookFormData(initialNewBookFormData);
+    setNewBookModalFormData(initialNewBookFormData);
     setShowModal(!showModal);
-    setCreateBookModalError('');
+    setNewBookModalError('');
   }, [initialNewBookFormData, showModal]);
 
-  const createNewBook = useCallback(async () => {
+  const handleNewBookModalSubmit = useCallback(async () => {
     try {
-      setIsLoadingSubmitNewBook(true);
-
-      const createBookTx = await contract.addBook(newBookFromData.name, newBookFromData.copies);
-      await createBookTx.wait();
-
+      setIsLoadingNewBookModalSubmit(true);
+      await createNewBook(newBookModalFormData.name, newBookModalFormData.copies);
       handleModal();
       await getBooks();
     } catch (error) {
-      setError(error.reason, setCreateBookModalError);
-    } finally {
-      setIsLoadingSubmitNewBook(false);
+      setIsLoadingNewBookModalSubmit(false);
+      setError(error.reason, setNewBookModalError);
     }
-  }, [contract, handleModal, newBookFromData, getBooks]);
+  }, [createNewBook, newBookModalFormData, handleModal, getBooks]);
 
+  // Modal
   const modalActionBar = [
     <Button
-      onClick={createNewBook}
-      loading={isLoadingSubmitNewBook}
+      onClick={handleNewBookModalSubmit}
+      loading={isLoadingNewBookModalSubmit}
       className="mx-3"
       key="accept-modal-btn"
     >
@@ -174,8 +140,8 @@ const Library = () => {
       <div className="mb-4">
         <h2>Create New Book</h2>
 
-        {createBookModalError ? (
-          <div className="alert alert-danger mt-4">{createBookModalError}</div>
+        {newBookModalError ? (
+          <div className="alert alert-danger mt-4">{newBookModalError}</div>
         ) : null}
 
         <div className="mt-4">
@@ -185,8 +151,8 @@ const Library = () => {
             type="text"
             className="form-control"
             name="name"
-            value={newBookFromData.name}
-            onChange={handleFormInputChange}
+            value={newBookModalFormData.name}
+            onChange={handleModalFormInputChange}
           />
         </div>
 
@@ -197,24 +163,13 @@ const Library = () => {
             type="number"
             className="form-control"
             name="copies"
-            value={newBookFromData.copies}
-            onChange={handleFormInputChange}
+            value={newBookModalFormData.copies}
+            onChange={handleModalFormInputChange}
           />
         </div>
       </div>
     </Modal>
   );
-  // End Modal
-
-  useEffect(() => {
-    if (signer) {
-      setContract(new ethers.Contract(contractAddress, libraryABI.abi, signer));
-    }
-  }, [signer]);
-
-  useEffect(() => {
-    contract && getBooks();
-  }, [contract, getBooks]);
 
   useEffect(() => {
     contract && filterBooks();
@@ -230,7 +185,9 @@ const Library = () => {
           className="mx-3"
           options={filterOptions}
           value={filterBy}
-          onChange={handleFilterByChange}
+          onChange={option => {
+            setFilterBy(option);
+          }}
         />
 
         <Button className="d-flex align-items-center" onClick={handleModal}>
@@ -240,18 +197,15 @@ const Library = () => {
         {showModal && modal}
       </div>
 
-      {returnBorrowError ? (
-        <div className="alert alert-danger mb-4">{returnBorrowError}</div>
-      ) : null}
+      {bookListError ? <div className="alert alert-danger mb-4">{bookListError}</div> : null}
 
       {isLoadingBooks ? (
         <LoadingSpinner />
       ) : (
         <BookList
           bookList={filteredBooks}
-          borrowBook={borrowBook}
-          returnBook={returnBook}
-          getBooks={getBooks}
+          borrowBook={handleBorrowBook}
+          returnBook={handleReturnBook}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Book from './Book';
 
-const BookList = ({ bookList, borrowBook, returnBook, getBooks }) => {
+const BookList = ({ bookList, borrowBook, returnBook }) => {
   return (
     <div className="row">
       {bookList.map((book, index) => (

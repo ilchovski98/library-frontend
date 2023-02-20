@@ -27,9 +27,8 @@ function App() {
           <Header />
           <div className="main">
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Library />} />
               <Route path="/election" element={<Election />} />
-              <Route path="/library" element={<Library />} />
             </Routes>
           </div>
           <Footer />
