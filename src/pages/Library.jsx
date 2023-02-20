@@ -82,16 +82,26 @@ const Library = () => {
     setFilteredBooks(filteredBooks);
   }, [books, filterBy, contract, address]);
 
+  const setError = (errorMessage, setErrorState) => {
+    if (!(errorMessage === 'user rejected transaction')) {
+      setErrorState(errorMessage);
+    } else {
+      setErrorState('');
+    }
+  };
+
   const borrowBook = useCallback(
     async bookName => {
       try {
         const borrowBookTx = await contract.borrowBook(bookName);
         const receipt = await borrowBookTx.wait();
+        setReturnBorrowError('');
+        await getBooks();
       } catch (error) {
-        setReturnBorrowError(error.reason);
+        setError(error.reason, setReturnBorrowError);
       }
     },
-    [contract],
+    [contract, getBooks],
   );
 
   const returnBook = useCallback(
@@ -99,11 +109,13 @@ const Library = () => {
       try {
         const returnBookTx = await contract.returnBook(bookName);
         const receipt = await returnBookTx.wait();
+        setReturnBorrowError('');
+        await getBooks();
       } catch (error) {
-        setReturnBorrowError(error.reason);
+        setError(error.reason, setReturnBorrowError);
       }
     },
-    [contract],
+    [contract, getBooks],
   );
 
   const handleFilterByChange = option => {
@@ -124,6 +136,7 @@ const Library = () => {
   const handleModal = useCallback(async () => {
     setNewBookFormData(initialNewBookFormData);
     setShowModal(!showModal);
+    setCreateBookModalError('');
   }, [initialNewBookFormData, showModal]);
 
   const createNewBook = useCallback(async () => {
@@ -136,7 +149,7 @@ const Library = () => {
       handleModal();
       await getBooks();
     } catch (error) {
-      setCreateBookModalError(error.reason);
+      setError(error.reason, setCreateBookModalError);
     } finally {
       setIsLoadingSubmitNewBook(false);
     }

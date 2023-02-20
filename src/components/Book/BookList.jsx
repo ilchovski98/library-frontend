@@ -6,13 +6,7 @@ const BookList = ({ bookList, borrowBook, returnBook, getBooks }) => {
     <div className="row">
       {bookList.map((book, index) => (
         <div className="col-md-3 mb-5" key={index + '-book-name-' + book.name}>
-          <Book
-            bookData={book}
-            image="/book.jpg"
-            borrowBook={borrowBook}
-            returnBook={returnBook}
-            getBooks={getBooks}
-          />
+          <Book bookData={book} image="/book.jpg" borrowBook={borrowBook} returnBook={returnBook} />
         </div>
       ))}
     </div>

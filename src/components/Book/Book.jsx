@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../ui/Button';
 
-const Book = ({ bookData, image, borrowBook, returnBook, getBooks }) => {
+const Book = ({ bookData, image, borrowBook, returnBook }) => {
   const [isBorrowBtnLoading, setIsBorrowBtnLoading] = useState(false);
   const [isReturnBtnLoading, setIsReturnBtnLoading] = useState(false);
 
@@ -9,14 +9,12 @@ const Book = ({ bookData, image, borrowBook, returnBook, getBooks }) => {
     setIsBorrowBtnLoading(true);
     await borrowBook(bookData.name);
     setIsBorrowBtnLoading(false);
-    await getBooks();
   };
 
   const handleReturnBook = async () => {
     setIsReturnBtnLoading(true);
     await returnBook(bookData.name);
     setIsReturnBtnLoading(false);
-    await getBooks();
   };
 
   return (
