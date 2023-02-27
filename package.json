@@ -28,12 +28,14 @@
   "dependencies": {
     "bootstrap": "^5.2.0",
     "ethers": "^5.7.2",
+    "graphql": "^16.6.0",
     "md5": "^2.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "sass": "^1.54.0",
+    "urql": "^3.0.3",
     "wagmi": "^0.10.10"
   },
   "devDependencies": {

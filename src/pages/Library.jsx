@@ -28,8 +28,20 @@ const Library = () => {
     copies: 0,
   };
 
-  const { contract, books, isLoadingBooks, borrowBook, returnBook, createNewBook, getBooks } =
-    useLibrary();
+  const {
+    contract,
+    books,
+    isLoadingBooks,
+    borrowBook,
+    returnBook,
+    createNewBook,
+    getBooks,
+    data,
+    isError,
+    isLoading,
+    isSuccess,
+    signTypedData,
+  } = useLibrary();
 
   // Page state
   const [bookListError, setBookListError] = useState();
@@ -169,9 +181,15 @@ const Library = () => {
     contract && filterBooks();
   }, [contract, filterBy, filterBooks]);
 
+  useEffect(() => {
+    console.log('isError, isLoading, isSuccess, data', isError, isLoading, isSuccess, data);
+  }, [data, isError, isLoading, isSuccess]);
+
   return (
     <div className="container my-5 my-lg-10">
       <h2 className="heading-medium text-center mb-5">Library</h2>
+
+      <Button onClick={signTypedData}>SIGN ME</Button>
 
       <div className="d-flex justify-content-end align-items-center mb-4">
         <Dropdown
